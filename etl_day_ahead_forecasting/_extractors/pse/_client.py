@@ -3,6 +3,7 @@ import functools
 import logging
 import time
 import typing as t
+from dataclasses import dataclass
 
 import pandas as pd
 import pydantic
@@ -18,8 +19,8 @@ def _wait_if_there_was_extraction_recently(func):
     @functools.wraps(func)
     def inner(self, *agrs, **kwargs):
         time_since_last_call = dt.datetime.now() - self._last_called
-        if time_since_last_call < dt.timedelta(seconds=60):
-            seconds_to_wait = 60 - time_since_last_call.seconds
+        if time_since_last_call < dt.timedelta(seconds=30):
+            seconds_to_wait = 30 - time_since_last_call.seconds
             logger.info('PseClient extract method has been called recently.'
                         f' Waiting for {seconds_to_wait} seconds to call it once again.')
             time.sleep(seconds_to_wait)
@@ -45,28 +46,35 @@ class _PseDateRange:
             raise PseTooBroadTimeRangeError(date_range=end-start)
 
 
-class _PseClient(pydantic.BaseModel):
-    data_type: pydantic.StrictStr
+@dataclass
+class _PseClient:
+    data_type: str
     start: dt.date
     end: dt.date
-    _max_retires: int = pydantic.Field(2, const=True)
-    _get_retries: int = 0
+    _max_retires: int = 3
+    _retries: int = 0
 
     def get(self) -> Response:
         response = requests.get(self._create_url())
         if response.ok:
+            logger.info(f'EXTRACTED: data {self.data_type} for date range'
+                        f' < {self.start.strftime("%Y-%m-%d")} : {self.end.strftime("%Y-%m-%d")} >')
             return response
-        elif response.status_code == 429 and self._get_retries <= self._max_retires:
+        elif response.status_code == 429 and self._retries <= self._max_retires:
             logger.warning(f'{response.reason}. Waiting for 10 minutes and retrying.')
             time.sleep(600)
-            self._get_retries += 1
+            self._retries += 1
             return self.get()
         else:
             response.raise_for_status()
 
     def _create_url(self) -> str:
-        return f'https://www.pse.pl/getcsv/-/export/csv/{self.data_type}/' \
-               f'data_od/{self.start.strftime("%Y%m%d")}/data_do/{self.end.strftime("%Y%m%d")}'
+        if self.data_type == 'PL_CENY_ROZL_CO2':
+            return 'https://www.pse.pl/getcsv/-/export/csv/PL_CENY_ROZL_CO2/data/' \
+                   f'{self.start.strftime("%Y%m%d")}/datdo/{self.end.strftime("%Y-%m-%d")}'
+        else:
+            return f'https://www.pse.pl/getcsv/-/export/csv/{self.data_type}/' \
+                   f'data_od/{self.start.strftime("%Y%m%d")}/data_do/{self.end.strftime("%Y%m%d")}'
 
     @pydantic.root_validator
     def _validate_date_range(cls, values) -> None:  # noqa

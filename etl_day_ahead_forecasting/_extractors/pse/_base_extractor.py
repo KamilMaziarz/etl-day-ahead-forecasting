@@ -25,7 +25,7 @@ class BasePseExtractor(PipelineStep[ETLPropertiesTimeRange], metaclass=ABCMeta):
     @staticmethod
     def _parse_response(response: Response) -> pd.DataFrame:
         encoded_data = response.content.decode('cp1250')
-        return pd.read_csv(io.StringIO(encoded_data), sep=';', decimal=',')
+        return pd.read_csv(io.StringIO(encoded_data), sep=';', decimal=',', error_bad_lines=False)
 
     @abstractmethod
     def _get_data_type(self) -> str:
