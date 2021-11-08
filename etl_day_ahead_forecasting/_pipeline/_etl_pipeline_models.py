@@ -36,8 +36,8 @@ class ETLPropertiesLocalSave(ETLPropertiesPath):
     data_name: ETLDataName
 
 
-class ETLPropertiesLocalReadBackup(ETLPropertiesLocalSave):
-    read_backup: bool
+class ETLPropertiesReadBackup(ETLProperties):
+    pass
 
 
 class ETLPropertiesTimeRange(ETLProperties):

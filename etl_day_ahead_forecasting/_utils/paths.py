@@ -3,11 +3,7 @@ import re
 from os import path
 from pathlib import Path
 
-import pydantic
-
-from etl_day_ahead_forecasting._extractors._base_extractor import BaseExtractor  # noqa
-
-_PATH_ELEMENT = pydantic.constr(regex='^[a-z_]+$')
+from etl_day_ahead_forecasting._pipeline.etl_pipeline import PipelineStep  # noqa
 
 
 def get_resources_path() -> Path:
@@ -22,10 +18,9 @@ def change_camel_case_to_snake_case(string: str) -> str:
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', string).lower()
 
 
-@pydantic.validate_arguments
 def get_backup_path(
-        source: _PATH_ELEMENT,
-        extractor: BaseExtractor,
+        source: str,
+        extractor: PipelineStep,
         start: dt.date = dt.date(2018, 1, 1),
         end: dt.date = dt.date(2020, 12, 31),
 ) -> Path:

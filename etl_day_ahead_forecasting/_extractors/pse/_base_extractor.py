@@ -6,27 +6,27 @@ import pandas as pd
 from requests import Response
 
 from etl_day_ahead_forecasting._extractors._backup_drive_reader import BackupDriveReader
-from etl_day_ahead_forecasting._extractors._base_extractor import BaseExtractor
 from etl_day_ahead_forecasting._extractors.pse._client import PseClient  # noqa
 from etl_day_ahead_forecasting._pipeline._etl_pipeline_models import (  # noqa
     ETLPropertiesTimeRange,
-    ETLPropertiesLocalReadBackup,
+    ETLPropertiesReadBackup,
     ETLDataName,
     ETLPropertiesLocalSave,
     ETLPipelineData,
 )
+from etl_day_ahead_forecasting._pipeline.etl_pipeline import PipelineStep  # noqa
 from etl_day_ahead_forecasting._utils.paths import get_backup_path  # noqa
 
-_PSE_POSSIBLE_PROPERTIES = t.Union[ETLPropertiesTimeRange, ETLPropertiesLocalReadBackup]
+_PSE_POSSIBLE_PROPERTIES = t.Union[ETLPropertiesTimeRange, ETLPropertiesReadBackup]
 
 
-class BasePseExtractor(BaseExtractor[_PSE_POSSIBLE_PROPERTIES], metaclass=ABCMeta):
+class BasePseExtractor(PipelineStep[_PSE_POSSIBLE_PROPERTIES], metaclass=ABCMeta):
     def execute(
             self,
             properties: _PSE_POSSIBLE_PROPERTIES,
-            data: t.Optional[ETLPipelineData],
+            data: t.Optional[ETLPipelineData] = None,
     ) -> ETLPipelineData:
-        if hasattr(properties, 'read_backup') and properties.read_backup:
+        if isinstance(properties, ETLPropertiesReadBackup):
             return self._get_backup_file()
         return self._extract_from_pse_website(properties=properties)
 
