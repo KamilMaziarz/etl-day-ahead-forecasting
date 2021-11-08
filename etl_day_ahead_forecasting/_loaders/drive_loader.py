@@ -7,7 +7,7 @@ __all__ = ('DriveLoader',)
 
 
 class DriveLoader(PipelineStep[ETLPropertiesLocalSave]):
-    def execute(self, properties: ETLPropertiesLocalSave, data: ETLPipelineData) -> ETLPipelineData:
+    def execute(self, properties: ETLPropertiesLocalSave, data: ETLPipelineData = None) -> ETLPipelineData:
         if data is not None:
             with open(properties.path, 'wb') as file:
                 pickle.dump(data[properties.data_name], file)

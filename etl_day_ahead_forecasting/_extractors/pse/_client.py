@@ -69,6 +69,7 @@ class _PseClient:
             response.raise_for_status()
 
     def _create_url(self) -> str:
+        # date_from and date_to doesn't work on the PSE website. It returns just the date_from.
         if self.data_type == 'PL_CENY_ROZL_CO2':
             return 'https://www.pse.pl/getcsv/-/export/csv/PL_CENY_ROZL_CO2/data/' \
                    f'{self.start.strftime("%Y%m%d")}/datdo/{self.end.strftime("%Y-%m-%d")}'
@@ -95,3 +96,7 @@ class PseClient:
     @classmethod
     def divide_date_range_into_31_day_periods(cls, start: dt.date, end: dt.date) -> t.List[t.Tuple[dt.date, dt.date]]:
         return _PseDateRange().divide_date_range_into_31_day_periods(start=start, end=end)
+
+    @classmethod
+    def divide_date_range_into_daily_periods(cls, start: dt.date, end: dt.date) -> t.List[t.Tuple[dt.date, dt.date]]:
+        return [(d.date(), d.date()) for d in pd.date_range(start, end, freq='1D')]

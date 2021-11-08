@@ -1,5 +1,7 @@
 import datetime as dt
+import inspect
 import re
+import typing as t
 from os import path
 from pathlib import Path
 
@@ -20,12 +22,15 @@ def change_camel_case_to_snake_case(string: str) -> str:
 
 def get_backup_path(
         source: str,
-        extractor: PipelineStep,
+        extractor: t.Union[PipelineStep, t.Type[PipelineStep]],
         start: dt.date = dt.date(2018, 1, 1),
         end: dt.date = dt.date(2020, 12, 31),
 ) -> Path:
     resources_path = get_resources_path()
-    extractor_name = extractor.__class__.__name__
+    if inspect.isclass(extractor):
+        extractor_name = extractor.__name__
+    else:
+        extractor_name = extractor.__class__.__name__
     directory_name = change_camel_case_to_snake_case(string=extractor_name.replace('Extractor', ''))
     directory_path = resources_path / source / directory_name
     directory_path.mkdir(parents=True, exist_ok=True)

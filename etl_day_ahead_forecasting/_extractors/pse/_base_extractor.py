@@ -1,3 +1,4 @@
+import datetime as dt
 import io
 import typing as t
 from abc import abstractmethod, ABCMeta
@@ -37,12 +38,16 @@ class BasePseExtractor(PipelineStep[_PSE_POSSIBLE_PROPERTIES], metaclass=ABCMeta
 
     def _extract_from_pse_website(self, properties: _PSE_POSSIBLE_PROPERTIES) -> ETLPipelineData:
         pse_client = PseClient()
-        extract_periods = pse_client.divide_date_range_into_31_day_periods(start=properties.start, end=properties.end)
+        extract_periods = self._get_periods_to_extract(start=properties.start, end=properties.end)
         responses = [
             pse_client.extract(data_type=self._get_data_type(), start=s, end=e) for s, e in extract_periods
         ]
         extracted = pd.concat([self._parse_response(response=r) for r in responses])
         return {ETLDataName.EXTRACTED_DATA: extracted}
+
+    @staticmethod
+    def _get_periods_to_extract(start: dt.date, end: dt.date):
+        return PseClient.divide_date_range_into_31_day_periods(start=start, end=end)
 
     @staticmethod
     def _parse_response(response: Response) -> pd.DataFrame:
