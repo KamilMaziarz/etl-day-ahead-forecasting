@@ -9,7 +9,7 @@ _PATH_ELEMENT = pydantic.constr(regex='^[a-z_]+$')
 
 def get_resources_path() -> Path:
     current_path = Path(path.dirname(path.realpath(__file__)))
-    resources_path = current_path / ".." / ".." / "resources" / "pse_data"
+    resources_path = current_path / ".." / ".." / "resources"
     resources_path.mkdir(parents=True, exist_ok=True)
     return resources_path
 

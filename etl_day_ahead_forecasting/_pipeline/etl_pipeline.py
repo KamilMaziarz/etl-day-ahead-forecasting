@@ -38,10 +38,6 @@ class ETLPropertiesPath(pydantic.BaseModel):
         return value
 
 
-class ETLPropertiesPathWithDataType(ETLPropertiesDataTypeToLoad, ETLPropertiesPath):
-    pass
-
-
 class ETLPropertiesTimeRange(pydantic.BaseModel):
     start: dt.date
     end: dt.date
@@ -51,7 +47,11 @@ class ETLPropertiesLocalSave(ETLPropertiesPath, ETLPropertiesTimeRange):
     pass
 
 
-class ETLPropertiesLocalSaveWithDataType(ETLPropertiesPathWithDataType, ETLPropertiesTimeRange):
+class ETLPropertiesPathWithDataType(ETLPropertiesPath, ETLPropertiesDataTypeToLoad):
+    pass
+
+
+class ETLPropertiesLocalSaveWithDataType(ETLPropertiesLocalSave, ETLPropertiesDataTypeToLoad):
     pass
 
 
