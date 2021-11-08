@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pydantic
 
-from etl_day_ahead_forecasting._extractors._base_extractor import BaseExtractor
+from etl_day_ahead_forecasting._extractors._base_extractor import BaseExtractor  # noqa
 
 _PATH_ELEMENT = pydantic.constr(regex='^[a-z_]+$')
 

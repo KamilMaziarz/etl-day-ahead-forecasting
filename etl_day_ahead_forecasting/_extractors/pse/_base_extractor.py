@@ -26,7 +26,7 @@ class BasePseExtractor(BaseExtractor[_PSE_POSSIBLE_PROPERTIES], metaclass=ABCMet
             properties: _PSE_POSSIBLE_PROPERTIES,
             data: t.Optional[ETLPipelineData],
     ) -> ETLPipelineData:
-        if hasattr(ETLPropertiesTimeRange, 'read_backup') and properties.read_backup:
+        if hasattr(properties, 'read_backup') and properties.read_backup:
             return self._get_backup_file()
         return self._extract_from_pse_website(properties=properties)
 
