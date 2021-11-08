@@ -36,7 +36,7 @@ class ETLPropertiesLocalSave(ETLPropertiesPath):
     data_name: ETLDataName
 
 
-class ETLPropertiesLocalRead(ETLPropertiesLocalSave):
+class ETLPropertiesLocalReadBackup(ETLPropertiesLocalSave):
     read_backup: bool
 
 

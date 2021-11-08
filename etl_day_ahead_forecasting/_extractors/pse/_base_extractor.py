@@ -6,24 +6,36 @@ import pandas as pd
 from requests import Response
 
 from etl_day_ahead_forecasting._extractors._backup_drive_reader import BackupDriveReader
+from etl_day_ahead_forecasting._extractors._base_extractor import BaseExtractor
 from etl_day_ahead_forecasting._extractors.pse._client import PseClient  # noqa
-from etl_day_ahead_forecasting._pipeline.etl_pipeline import (  # noqa
-    PipelineStep,
+from etl_day_ahead_forecasting._pipeline._etl_pipeline_models import (  # noqa
     ETLPropertiesTimeRange,
+    ETLPropertiesLocalReadBackup,
+    ETLDataName,
     ETLPropertiesLocalSave,
     ETLPipelineData,
-    ETLDataName,
 )
+from etl_day_ahead_forecasting._utils.paths import get_backup_path  # noqa
+
+_PSE_POSSIBLE_PROPERTIES = t.Union[ETLPropertiesTimeRange, ETLPropertiesLocalReadBackup]
 
 
-class BasePseExtractor(PipelineStep[ETLPropertiesTimeRange], metaclass=ABCMeta):
+class BasePseExtractor(BaseExtractor[_PSE_POSSIBLE_PROPERTIES], metaclass=ABCMeta):
     def execute(
             self,
-            properties: ETLPropertiesTimeRange,
-            read_backup: bool = False,
+            properties: _PSE_POSSIBLE_PROPERTIES,
+            data: t.Optional[ETLPipelineData],
     ) -> ETLPipelineData:
-        if read_backup:
-            return self._read_backup_file(properties=properties)
+        if hasattr(ETLPropertiesTimeRange, 'read_backup') and properties.read_backup:
+            return self._get_backup_file()
+        return self._extract_from_pse_website(properties=properties)
+
+    def _get_backup_file(self) -> ETLPipelineData:
+        path = get_backup_path(source='pse', extractor=self)
+        backup_reader_properties = ETLPropertiesLocalSave(path=path, data_name=ETLDataName.EXTRACTED_DATA)
+        return BackupDriveReader().execute(properties=backup_reader_properties)
+
+    def _extract_from_pse_website(self, properties: _PSE_POSSIBLE_PROPERTIES) -> ETLPipelineData:
         pse_client = PseClient()
         extract_periods = pse_client.divide_date_range_into_31_day_periods(start=properties.start, end=properties.end)
         responses = [
@@ -31,12 +43,6 @@ class BasePseExtractor(PipelineStep[ETLPropertiesTimeRange], metaclass=ABCMeta):
         ]
         extracted = pd.concat([self._parse_response(response=r) for r in responses])
         return {ETLDataName.EXTRACTED_DATA: extracted}
-
-    def _read_backup_file(self, properties: ETLPropertiesTimeRange) -> t.Any:
-        reader = BackupDriveReader()
-        path = reader.get_backup_file_path_by_extractor_name(extractor_name=self.__class__.__name__, source='pse')
-        local_save_properties = ETLPropertiesLocalSave(path=path, start=properties.start, end=properties.end)
-        return BackupDriveReader().execute(properties=local_save_properties)
 
     @staticmethod
     def _parse_response(response: Response) -> pd.DataFrame:
