@@ -1,7 +1,7 @@
 import pickle
 
-from etl_day_ahead_forecasting._pipeline._etl_pipeline_models import ETLPropertiesLocalSave  # noqa
-from etl_day_ahead_forecasting._pipeline.etl_pipeline import PipelineStep, ETLPipelineData  # noqa
+from etl_day_ahead_forecasting.pipeline.etl_pipeline import PipelineStep, ETLPipelineData
+from etl_day_ahead_forecasting.pipeline.models import ETLPropertiesLocalSave
 
 __all__ = ('DriveLoader',)
 

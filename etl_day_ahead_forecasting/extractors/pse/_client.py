@@ -10,7 +10,7 @@ import pydantic
 import requests
 from requests import Response
 
-from etl_day_ahead_forecasting._exceptions import PseTooBroadTimeRangeError
+from etl_day_ahead_forecasting.exceptions import PseTooBroadTimeRangeError
 
 logger = logging.getLogger(__name__)
 

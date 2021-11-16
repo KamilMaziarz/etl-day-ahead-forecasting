@@ -18,6 +18,11 @@ class ETLTransformerError(ETLError):
     pass
 
 
+class ExpectedDataTypeNotFoundError(ETLTransformerError):
+    def __init__(self, expected_data_type: str):
+        super().__init__(f'Expected data type "{expected_data_type}" not found in data.')
+
+
 class ETLLoaderError(ETLError):
     pass
 

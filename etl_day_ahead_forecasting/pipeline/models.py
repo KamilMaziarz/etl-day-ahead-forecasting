@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pydantic
 
-from etl_day_ahead_forecasting._exceptions import IncorrectSuffixError
+from etl_day_ahead_forecasting.exceptions import IncorrectSuffixError
 
 
 class ETLDataName(Enum):
@@ -43,3 +43,11 @@ class ETLPropertiesReadBackup(ETLProperties):
 class ETLPropertiesTimeRange(ETLProperties):
     start: dt.date
     end: dt.date
+
+
+class ETLPropertiesDataType(ETLProperties):
+    data_type: ETLDataName
+
+
+class ETLPropertiesTimeRangeWithDataType(ETLPropertiesTimeRange, ETLPropertiesDataType):
+    pass
