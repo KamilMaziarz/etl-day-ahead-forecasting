@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 import pydantic
 
-from etl_day_ahead_forecasting._pipeline._etl_pipeline_models import ETLPipelinePropertiesT, ETLPipelineData
+from etl_day_ahead_forecasting.pipeline.models import ETLPipelinePropertiesT, ETLPipelineData
 
 
 class PipelineStep(t.Generic[ETLPipelinePropertiesT], metaclass=ABCMeta):

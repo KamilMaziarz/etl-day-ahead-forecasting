@@ -5,7 +5,7 @@ import typing as t
 from os import path
 from pathlib import Path
 
-from etl_day_ahead_forecasting._pipeline.etl_pipeline import PipelineStep  # noqa
+from etl_day_ahead_forecasting.pipeline.etl_pipeline import PipelineStep  # noqa
 
 
 def get_resources_path() -> Path:
