@@ -1,6 +1,6 @@
 import typing as t
 
-from etl_day_ahead_forecasting.transformers.pse._base_transformer import BasePseTransformer
+from etl_day_ahead_forecasting._transformers.pse._base_transformer import BasePseTransformer
 
 __all__ = ('CrossBorderFlowsTransformer',)
 

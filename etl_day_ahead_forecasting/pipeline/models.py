@@ -7,22 +7,30 @@ import pydantic
 
 from etl_day_ahead_forecasting.exceptions import IncorrectSuffixError
 
+__all__ = [
+    'ETLDataType',
+    'ETLPseProperties',
+    'ETLPsePropertiesSaveLocally',
+    'ETLPsePropertiesReadBackup',
+    'ETLPsePropertiesReadBackupSaveLocally',
+]
 
-class ETLDataName(Enum):
+
+class ETLDataType(Enum):
     EXTRACTED_DATA = auto()
     TRANSFORMED_DATA = auto()
 
 
-ETLPipelineData = t.Dict[ETLDataName, t.Any]
+_ETLPipelineData = t.Dict[ETLDataType, t.Any]
 
-ETLPipelinePropertiesT = t.TypeVar("ETLPipelinePropertiesT")
+_ETLPipelinePropertiesT = t.TypeVar("_ETLPipelinePropertiesT")
 
 
-class ETLProperties(pydantic.BaseModel):
+class _ETLProperties(pydantic.BaseModel):
     pass
 
 
-class ETLPropertiesPath(ETLProperties):
+class _ETLPropertiesPath(_ETLProperties):
     path: Path
 
     @pydantic.validator('path')
@@ -32,22 +40,39 @@ class ETLPropertiesPath(ETLProperties):
         return value
 
 
-class ETLPropertiesLocalSave(ETLPropertiesPath):
-    data_name: ETLDataName
+class _ETLPropertiesSaveLocal(_ETLPropertiesPath):
+    save_locally: bool = True
+    local_data_type: ETLDataType = ETLDataType.EXTRACTED_DATA
 
 
-class ETLPropertiesReadBackup(ETLProperties):
-    pass
+class _ETLPropertiesReadBackup(_ETLProperties):
+    read_backup: bool = True
 
 
-class ETLPropertiesTimeRange(ETLProperties):
+class _ETLPropertiesTimeRange(_ETLProperties):
     start: dt.date
     end: dt.date
 
 
-class ETLPropertiesDataType(ETLProperties):
-    data_type: ETLDataName
+class _ETLPropertiesDataTypeToBeTransformed(_ETLProperties):
+    data_type_to_be_transformed: ETLDataType = ETLDataType.EXTRACTED_DATA
 
 
-class ETLPropertiesTimeRangeWithDataType(ETLPropertiesTimeRange, ETLPropertiesDataType):
+class _ETLPropertiesTimeRangeWithDataType(_ETLPropertiesTimeRange, _ETLPropertiesDataTypeToBeTransformed):
+    pass
+
+
+class ETLPseProperties(_ETLPropertiesTimeRangeWithDataType):
+    pass
+
+
+class ETLPsePropertiesSaveLocally(ETLPseProperties, _ETLPropertiesSaveLocal):
+    pass
+
+
+class ETLPsePropertiesReadBackup(ETLPseProperties, _ETLPropertiesReadBackup):
+    pass
+
+
+class ETLPsePropertiesReadBackupSaveLocally(ETLPsePropertiesSaveLocally, _ETLPropertiesReadBackup):
     pass
