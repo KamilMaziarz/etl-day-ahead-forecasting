@@ -3,7 +3,7 @@ import typing as t
 
 import pandas as pd
 
-from etl_day_ahead_forecasting.pipeline.models import ETLDataName, ETLPipelineData
+from etl_day_ahead_forecasting.pipeline.models import ETLDataType, _ETLPipelineData  # noqa
 
 
 class TimeShiftHandler:
@@ -53,7 +53,7 @@ class CommonTransformer:
             column_mapping: t.Dict[str, str],
             date_format: str,
             group_by: t.Union[t.List[str], None],
-    ) -> ETLPipelineData:
+    ) -> _ETLPipelineData:
         truncated_data = TimeShiftHandler.remove_additional_hour_rows(data=data)
         truncated_data.index = DatetimeColumnCreator.create(
             data=truncated_data,
@@ -66,4 +66,4 @@ class CommonTransformer:
         filtered_data = truncated_data[start:dt.datetime.combine(end, dt.time(23))]
         filled_data = TimeShiftHandler.add_missing_rows_as_mean_of_adjacent(data=filtered_data, group_by=group_by)
         filled_data.rename(columns=column_mapping, inplace=True)
-        return {ETLDataName.TRANSFORMED_DATA: filled_data}
+        return {ETLDataType.TRANSFORMED_DATA: filled_data}

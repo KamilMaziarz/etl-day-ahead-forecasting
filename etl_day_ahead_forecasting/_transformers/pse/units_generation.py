@@ -2,9 +2,9 @@ import typing as t
 
 import pandas as pd
 
+from etl_day_ahead_forecasting._transformers.pse._base_transformer import BasePseTransformer
 from etl_day_ahead_forecasting.exceptions import ExpectedDataTypeNotFoundError
-from etl_day_ahead_forecasting.pipeline.models import ETLPropertiesTimeRangeWithDataType, ETLPipelineData
-from etl_day_ahead_forecasting.transformers.pse._base_transformer import BasePseTransformer
+from etl_day_ahead_forecasting.pipeline.models import _ETLPropertiesTimeRangeWithDataType, _ETLPipelineData  # noqa
 
 __all__ = ('UnitsGenerationTransformer',)
 
@@ -13,12 +13,13 @@ class UnitsGenerationTransformer(BasePseTransformer):
 
     def execute(
             self,
-            properties: ETLPropertiesTimeRangeWithDataType,
-            data: t.Optional[ETLPipelineData] = None,
-    ) -> ETLPipelineData:
-        if data is None or properties.data_type not in data:
-            raise ExpectedDataTypeNotFoundError(expected_data_type=properties.data_type.name)
-        data[properties.data_type] = self._get_cleaned_data(data=data[properties.data_type])
+            properties: _ETLPropertiesTimeRangeWithDataType,
+            data: t.Optional[_ETLPipelineData] = None,
+    ) -> _ETLPipelineData:
+        if data is None or properties.data_type_to_be_transformed not in data:
+            raise ExpectedDataTypeNotFoundError(expected_data_type=properties.data_type_to_be_transformed.name)
+        data[properties.data_type_to_be_transformed] = \
+            self._get_cleaned_data(data=data[properties.data_type_to_be_transformed])
         return super().execute(properties=properties, data=data)
 
     @staticmethod

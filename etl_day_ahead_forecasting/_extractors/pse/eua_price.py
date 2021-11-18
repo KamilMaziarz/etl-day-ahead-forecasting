@@ -1,7 +1,7 @@
 import datetime as dt
 
-from etl_day_ahead_forecasting.extractors.pse._base_extractor import BasePseExtractor
-from etl_day_ahead_forecasting.extractors.pse._client import PseClient
+from etl_day_ahead_forecasting._extractors.pse._base_extractor import BasePseExtractor
+from etl_day_ahead_forecasting._extractors.pse._client import PseClient
 
 __all__ = ('EuaPriceExtractor',)
 
