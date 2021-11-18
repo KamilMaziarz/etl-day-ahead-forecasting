@@ -1,9 +1,8 @@
-from etl_day_ahead_forecasting.pipeline import system_operation_data_pipeline, ETLPsePropertiesReadBackup, \
-    renewables_generation_pipeline, ETLPsePropertiesSaveLocally
 import datetime as dt
 
+from etl_day_ahead_forecasting.pipeline import system_operation_data_pipeline, ETLPsePropertiesReadBackup, \
+    renewables_generation_pipeline, ETLPsePropertiesSaveLocally
 from etl_day_ahead_forecasting.utils import get_resources_path, initialize_logging
-
 
 if __name__ == '__main__':
     initialize_logging()
